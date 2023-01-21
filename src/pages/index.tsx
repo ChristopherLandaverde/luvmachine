@@ -19,7 +19,7 @@ const dancingScript = Dancing_Script({
 interface CardFormState {
   to: string;
   from: string;
-  message: string;
+  msg: string;
 }
 
 /* CONSTS */
@@ -27,7 +27,7 @@ interface CardFormState {
 const emptyFormState: CardFormState = {
   to: "",
   from: "",
-  message: "",
+  msg: "",
 };
 
 /* HISTORY PUSHSTATE */
@@ -80,8 +80,9 @@ const luvMachine =
   createMachine(
     {
       ...initMachine(),
-      predictableActionArguments: true,
       id: "luvMachine",
+      predictableActionArguments: true,
+      tsTypes: {} as import("./index.typegen").Typegen0,
       states: {
         greeting: {
           on: {
@@ -90,10 +91,17 @@ const luvMachine =
         },
         edit: {
           on: {
-            CREATE: "view",
+            CREATE: { target: "view", actions: "updateFormState" },
           },
         },
-        view: {},
+        view: {
+          entry(ctx) {
+            saveFormState(ctx);
+          },
+          on: {
+            EDIT: "view",
+          },
+        },
       },
       on: {
         RESET: { target: "greeting", actions: "resetState" },
@@ -102,30 +110,60 @@ const luvMachine =
     {
       actions: {
         resetState: assign({ ...emptyFormState }),
+        updateFormState: assign((ctx, { from, to, msg }) => {
+          return { from, to, msg };
+        }),
       },
     },
   );
 
 /* COMPONENTS */
 
-function CardForm() {
+interface CardFormProps {
+  onCreate: (to: string, from: string, msg: string) => void;
+}
+
+function CardForm({ onCreate }: CardFormProps) {
+  const [toText, setToText] = useState<string>("");
+  const [fromText, setFromText] = useState<string>("");
+  const [msgText, setMsgText] = useState<string>("");
   return (
     <div>
       <label className="block mb-4">
         <span className="block">To:</span>
-        <input className="block border border-black w-full" type="text" />
+        <input
+          className="block border border-black w-full"
+          type="text"
+          value={toText}
+          onChange={(evt) => setToText(evt.target.value)}
+        />
       </label>
       <label className="block mb-4">
         <span className="block">From:</span>
-        <input className="block border border-black w-full" type="text" />
+        <input
+          className="block border border-black w-full"
+          type="text"
+          value={fromText}
+          onChange={(evt) => setFromText(evt.target.value)}
+        />
       </label>
       <label className="block mb-4">
         <span className="block">Message:</span>
         <input
           className="block border border-black h-[150px] w-full"
           type="text"
+          value={msgText}
+          onChange={(evt) => setMsgText(evt.target.value)}
         />
       </label>
+      <div>
+        <button
+          className="text-white bg-primary p-4 rounded-full text-lg w-[200px]"
+          onClick={() => onCreate(toText, fromText, msgText)}
+        >
+          Create
+        </button>
+      </div>
     </div>
   );
 }
@@ -142,6 +180,7 @@ export default function Home() {
         send({ type: "RESET" });
         break;
       case "edit":
+        send({ type: "EDIT" });
         break;
       case "view":
         send({ type: "RESET" });
@@ -189,20 +228,16 @@ export default function Home() {
           )}
           {current.matches("edit") && (
             <div className="p-4">
-              <CardForm />
-              <div>
-                <button
-                  className="text-white bg-primary p-4 rounded-full text-lg w-[200px]"
-                  onClick={() => send({ type: "CREATE" })}
-                >
-                  Create
-                </button>
-              </div>
+              <CardForm
+                onCreate={(t, f, m) =>
+                  send({ type: "CREATE", to: t, from: f, msg: m })
+                }
+              />
             </div>
           )}
           {current.matches("view") && (
             <div>
-              <div>Card preview component</div>
+              <pre>{JSON.stringify(current.context, null, 2)}</pre>
             </div>
           )}
         </div>
