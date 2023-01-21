@@ -2,13 +2,38 @@ import Head from "next/head";
 import Image from "next/image";
 import { Inter, Dancing_Script } from "@next/font/google";
 import styles from "@/styles/Home.module.css";
+import { createMachine } from "xstate";
+import { useMachine } from "@xstate/react";
 
 const inter = Inter({ subsets: ["latin"] });
 const dancingScript = Dancing_Script({
   subsets: ["latin"],
 });
 
+const luvMachine = createMachine({
+  predictableActionArguments: true,
+  id: "luvMachine",
+  initial: "greeting",
+  states: {
+    greeting: {
+      on: {
+        GET_STARTED: "edit",
+      },
+    },
+    edit: {
+      on: {
+        CREATE: "view",
+      },
+    },
+    view: {},
+  },
+});
+
 export default function Home() {
+  const [state, send] = useMachine(luvMachine);
+
+  console.log(state);
+
   return (
     <>
       <Head>
