@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Image from "next/image";
-import { Rubik, Roboto } from "@next/font/google";
+import { Rubik, Roboto, Reenie_Beanie } from "@next/font/google";
 import styles from "@/styles/Home.module.css";
 import { assign, createMachine } from "xstate";
 import { useMachine } from "@xstate/react";
@@ -11,6 +11,7 @@ import queryString from "query-string";
 
 const rubik = Rubik({ subsets: ["latin"] });
 const roboto = Roboto({ subsets: ["latin"], weight: ["400", "500"] });
+const reenie = Reenie_Beanie({ subsets: ["latin"], weight: "400" });
 
 /* TYPES */
 
@@ -79,6 +80,7 @@ const luvMachine =
     {
       ...initMachine(),
       id: "luvMachine",
+      // initial: "edit",
       predictableActionArguments: true,
       tsTypes: {} as import("./index.typegen").Typegen0,
       states: {
@@ -117,6 +119,18 @@ const luvMachine =
 
 /* COMPONENTS */
 
+function Preview({ to, from, msg }: { to: string; from: string; msg: string }) {
+  return (
+    <div
+      className={`text-4xl bg-white rounded-lg p-8 border border-black ${reenie.className}`}
+    >
+      <div className="mb-4">Dear {to},</div>
+      <div>{msg}</div>
+      <div className="text-right mt-4">From {from}</div>
+    </div>
+  );
+}
+
 interface CardFormProps {
   onCreate: (to: string, from: string, msg: string) => void;
 }
@@ -125,41 +139,47 @@ function CardForm({ onCreate }: CardFormProps) {
   const [toText, setToText] = useState<string>("");
   const [fromText, setFromText] = useState<string>("");
   const [msgText, setMsgText] = useState<string>("");
+
   return (
     <div>
       <label className="block mb-4">
-        <span className="block">To:</span>
+        <span className="block text-xl mb-2">To:</span>
         <input
-          className="block border border-black w-full"
+          className="block border border-black w-full h-[50px] rounded-md"
           type="text"
           value={toText}
           onChange={(evt) => setToText(evt.target.value)}
         />
       </label>
-      <label className="block mb-4">
-        <span className="block">From:</span>
+      <label className="block mb-8">
+        <span className="block text-xl mb-2">From:</span>
         <input
-          className="block border border-black w-full"
+          className="block border border-black w-full h-[50px] rounded-md"
           type="text"
           value={fromText}
           onChange={(evt) => setFromText(evt.target.value)}
         />
       </label>
-      <label className="block mb-4">
-        <span className="block">Message:</span>
-        <input
-          className="block border border-black h-[150px] w-full"
-          type="text"
+      <label className="block mb-8">
+        <span className="block text-xl mb-2">Message:</span>
+        <textarea
+          className="block border border-black h-[170px] w-full rounded-md"
           value={msgText}
           onChange={(evt) => setMsgText(evt.target.value)}
         />
       </label>
+      {toText && fromText && msgText && (
+        <div className="mb-8 ">
+          <div className="text-xl mb-2">Preview:</div>
+          <Preview to={toText} from={fromText} msg={msgText} />
+        </div>
+      )}
       <div>
         <button
-          className="text-white bg-primary p-4 rounded-full text-lg w-[200px]"
+          className="w-full text-white bg-primary p-2 rounded-full text-lg"
           onClick={() => onCreate(toText, fromText, msgText)}
         >
-          Create
+          Publish
         </button>
       </div>
     </div>
@@ -194,10 +214,10 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={`${roboto.className} bg-secondary pt-24`}>
+      <main className={`${roboto.className} bg-secondary`}>
         <div className="max-w-sm mx-auto">
           {current.matches("greeting") && (
-            <div className="mb-36">
+            <div className="mt-24 mb-36">
               <div className="flex justify-center mb-18">
                 <div className="rounded-lg text-sm text-white p-8">
                   <Image src="/cuate.png" alt={""} height="250" width="250" />
@@ -228,7 +248,7 @@ export default function Home() {
             </div>
           )}
           {current.matches("edit") && (
-            <div className="p-4">
+            <div className="p-4 mt-12">
               <CardForm
                 onCreate={(t, f, m) =>
                   send({ type: "CREATE", to: t, from: f, msg: m })
