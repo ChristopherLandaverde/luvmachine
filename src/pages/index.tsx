@@ -4,11 +4,16 @@ import { Inter, Dancing_Script } from "@next/font/google";
 import styles from "@/styles/Home.module.css";
 import { createMachine } from "xstate";
 import { useMachine } from "@xstate/react";
+import { useEffect } from "react";
+
+/* FONTS */
 
 const inter = Inter({ subsets: ["latin"] });
 const dancingScript = Dancing_Script({
   subsets: ["latin"],
 });
+
+/* XSTATE */
 
 const luvMachine = createMachine({
   predictableActionArguments: true,
@@ -17,7 +22,12 @@ const luvMachine = createMachine({
   states: {
     greeting: {
       on: {
-        GET_STARTED: "edit",
+        GET_STARTED: {
+          target: "edit",
+          actions(context, event, meta) {
+            window.history.pushState(null, "", "#edit")
+          },
+        }
       },
     },
     edit: {
@@ -28,6 +38,9 @@ const luvMachine = createMachine({
     view: {},
   },
 });
+
+
+/* COMPONENTS */
 
 export default function Home() {
   const [current, send] = useMachine(luvMachine);
