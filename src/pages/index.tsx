@@ -82,7 +82,6 @@ const luvMachine =
       id: "luvMachine",
       // initial: "edit",
       predictableActionArguments: true,
-      tsTypes: {} as import("./index.typegen").Typegen0,
       states: {
         greeting: {
           on: {
