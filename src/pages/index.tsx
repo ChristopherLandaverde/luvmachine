@@ -15,30 +15,31 @@ const dancingScript = Dancing_Script({
 
 /* XSTATE */
 
-const luvMachine = createMachine({
-  predictableActionArguments: true,
-  id: "luvMachine",
-  initial: "greeting",
-  states: {
-    greeting: {
-      on: {
-        GET_STARTED: {
-          target: "edit",
-          actions(context, event, meta) {
-            window.history.pushState(null, "", "#edit")
+const luvMachine =
+  /** @xstate-layout N4IgpgJg5mDOIC5QBsCuA3AsgQwMYAsBLAOzADooAnMMAFxKgGIBxAUQBUB9AZXYEEASu1YARANoAGALqJQABwD2sQvQXFZIAB6IAjADYAzGQCcAdmP6ATGb0AWPcYCsADgA0IAJ6JnOsrfP6Ek4SzhISlnoAvpHuaFh4RKRkkCqMAMICrHzCkjJIIIrKqur52gi2jrZklhGOejoVDfU67l4IOhJVlqbOdpYGOjWmljo60TEgxAoQcBpxOAQkYBqFKoRqGmUAtHqtiFuOJsbHJ6cnBtGxGAuJ5FQ09MRQK0prG6WItpZ77Z1kpno6jpnJZHGC7AYLhN5gklskICoXkV1iVQGVIZZqv4DMZnP5bMcdJUfh0qgC6t1nAZLBIAYZLiAYYskuhCGAAO5It6orSIRymQ4AgwSBrGEIdQYkv7k+ogsF1WyQ8aRIA */
+  createMachine({
+    predictableActionArguments: true,
+    id: "luvMachine",
+    initial: "greeting",
+    states: {
+      greeting: {
+        on: {
+          GET_STARTED: {
+            target: "edit",
+            actions(context, event, meta) {
+              window.history.pushState(null, "", "#edit");
+            },
           },
-        }
+        },
       },
-    },
-    edit: {
-      on: {
-        CREATE: "view",
+      edit: {
+        on: {
+          CREATE: "view",
+        },
       },
+      view: {},
     },
-    view: {},
-  },
-});
-
+  });
 
 /* COMPONENTS */
 
@@ -107,6 +108,7 @@ export default function Home() {
               </label>
             </div>
           )}
+          {current.matches("view") && <div>Final card state</div>}
         </div>
       </main>
     </>
