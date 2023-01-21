@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Image from "next/image";
-import { Inter, Dancing_Script } from "@next/font/google";
+import { Rubik, Roboto } from "@next/font/google";
 import styles from "@/styles/Home.module.css";
 import { assign, createMachine } from "xstate";
 import { useMachine } from "@xstate/react";
@@ -9,10 +9,8 @@ import queryString from "query-string";
 
 /* FONTS */
 
-const inter = Inter({ subsets: ["latin"] });
-const dancingScript = Dancing_Script({
-  subsets: ["latin"],
-});
+const rubik = Rubik({ subsets: ["latin"] });
+const roboto = Roboto({ subsets: ["latin"], weight: ["400", "500"] });
 
 /* TYPES */
 
@@ -96,7 +94,7 @@ const luvMachine =
         },
         view: {
           entry(ctx) {
-            saveFormState(ctx);
+            // saveFormState(ctx);
           },
           on: {
             EDIT: "view",
@@ -173,20 +171,20 @@ export default function Home() {
   // Ugh, Next.js
   const shouldNotRender = useDisableSSR();
 
-  usePopState(() => {
-    const formState = getPage();
-    switch (formState) {
-      case "greeting":
-        send({ type: "RESET" });
-        break;
-      case "edit":
-        send({ type: "EDIT" });
-        break;
-      case "view":
-        send({ type: "RESET" });
-        break;
-    }
-  });
+  // usePopState(() => {
+  //   const formState = getPage();
+  //   switch (formState) {
+  //     case "greeting":
+  //       send({ type: "RESET" });
+  //       break;
+  //     case "edit":
+  //       send({ type: "EDIT" });
+  //       break;
+  //     case "view":
+  //       send({ type: "RESET" });
+  //       break;
+  //   }
+  // });
 
   return shouldNotRender ? null : (
     <>
@@ -196,29 +194,32 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={`${inter.className} bg-secondary pt-36`}>
+      <main className={`${roboto.className} bg-secondary pt-24`}>
         <div className="max-w-sm mx-auto">
           {current.matches("greeting") && (
             <div className="mb-36">
-              <div className="flex justify-center mb-24">
-                <div className="h-[200px] w-[200px] border-2 border-white-500 rounded-lg text-sm text-white p-8">
-                  Logo graphic goes here
+              <div className="flex justify-center mb-18">
+                <div className="rounded-lg text-sm text-white p-8">
+                  <Image src="/cuate.png" alt={""} height="250" width="250" />
                 </div>
               </div>
               <h1
-                className={`text-6xl font-bold text-center mb-6 ${dancingScript.className}`}
+                className={`text-5xl font-bold text-center mb-4 ${rubik.className}`}
               >
                 Luv Machine
               </h1>
-              <h2 className="text-md text-center mb-20">
-                Let Us State Your Message!
+              <h2 className="text-md text-center mb-12">
+                The Only Valentine's Day Card You Need
+              </h2>
+              <h2 className="text-md text-center mb-12">
+                Let Us "State" Your Message!
               </h2>
               <div className="text-center">
                 <button
                   className="text-white bg-primary p-4 rounded-full text-lg w-[200px]"
                   onClick={() => {
                     send({ type: "GET_STARTED" });
-                    window.history.pushState(null, "", "#edit");
+                    // window.history.pushState(null, "", "#edit");
                   }}
                 >
                   Get started
@@ -258,9 +259,9 @@ function useDisableSSR(): boolean {
   return disableSSR;
 }
 
-function usePopState(callback: () => void) {
-  useEffect(() => {
-    window.addEventListener("popstate", callback);
-    return () => window.removeEventListener("popstate", callback);
-  }, []);
-}
+// function usePopState(callback: () => void) {
+//   useEffect(() => {
+//     window.addEventListener("popstate", callback);
+//     return () => window.removeEventListener("popstate", callback);
+//   }, []);
+// }
