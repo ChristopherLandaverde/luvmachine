@@ -124,9 +124,9 @@ function Preview({ to, from, msg }: { to: string; from: string; msg: string }) {
     <div
       className={`text-4xl bg-white rounded-lg p-8 border border-black ${reenie.className}`}
     >
-      <div className="mb-4">Dear {to},</div>
-      <div>{msg}</div>
-      <div className="text-right mt-4">From {from}</div>
+      <div className="mb-8">Dear {to},</div>
+      <div className="text-3xl p-2">{msg}</div>
+      <div className="text-right mt-8">From {from}</div>
     </div>
   );
 }
@@ -145,7 +145,7 @@ function CardForm({ onCreate }: CardFormProps) {
       <label className="block mb-4">
         <span className="block text-xl mb-2">To:</span>
         <input
-          className="block border border-black w-full h-[50px] rounded-md"
+          className="block border border-black w-full h-[50px] rounded-md p-2"
           type="text"
           value={toText}
           onChange={(evt) => setToText(evt.target.value)}
@@ -154,7 +154,7 @@ function CardForm({ onCreate }: CardFormProps) {
       <label className="block mb-8">
         <span className="block text-xl mb-2">From:</span>
         <input
-          className="block border border-black w-full h-[50px] rounded-md"
+          className="block border border-black w-full h-[50px] rounded-md p-2"
           type="text"
           value={fromText}
           onChange={(evt) => setFromText(evt.target.value)}
@@ -163,7 +163,7 @@ function CardForm({ onCreate }: CardFormProps) {
       <label className="block mb-8">
         <span className="block text-xl mb-2">Message:</span>
         <textarea
-          className="block border border-black h-[170px] w-full rounded-md"
+          className="block border border-black h-[170px] w-full rounded-md p-2"
           value={msgText}
           onChange={(evt) => setMsgText(evt.target.value)}
         />
@@ -257,8 +257,30 @@ export default function Home() {
             </div>
           )}
           {current.matches("view") && (
-            <div>
-              <pre>{JSON.stringify(current.context, null, 2)}</pre>
+            <div className="p-4 mt-12">
+              <div className="flex justify-center">
+                <Image src="/rafiki.png" alt={""} height="300" width="300" />
+              </div>
+              <div className="text-center mt-8 mb-4">
+                <p className={`${rubik.className} text-lg font-bold`}>
+                  Congrats! You Finished Your Card!
+                </p>
+              </div>
+              <div className="mb-8">
+                <Preview {...current.context} />
+              </div>
+              <div className="text-center">
+                <div className="mb-4">
+                  <button className="text-white bg-primary p-4 rounded-full text-lg w-[200px]">
+                    Share
+                  </button>
+                </div>
+                <div>
+                  <button className="text-white bg-primary p-4 rounded-full text-lg w-[200px]">
+                    Start Another Card
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
