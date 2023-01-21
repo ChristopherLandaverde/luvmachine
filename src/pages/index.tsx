@@ -79,6 +79,7 @@ const luvMachine =
   /** @xstate-layout N4IgpgJg5mDOIC5QBsCuA3AsgQwMYAsBLAOzADooAnMMAFxKgGIBxAUQBUB9AZXYEEASu1YARANoAGALqJQABwD2sQvQXFZIAB6IAjADYAzGQCcAdmP6ATGb0AWPcYCsADgA0IAJ6JnOsrfP6Ek4SzhISlnoAvpHuaFh4RKRkkCqMAMICrHzCkjJIIIrKqur52gi2jrZklhGOejoVDfU67l4IOhJVlqbOdpYGOjWmljo60TEgxAoQcBpxOAQkYBqFKoRqGmUAtHqtiFuOJsbHJ6cnBtGxGAuJ5FQ09MRQK0prG6WItpZ77Z1kpno6jpnJZHGC7AYLhN5gklskICoXkV1iVQGVIZZqv4DMZnP5bMcdJUfh0qgC6t1nAZLBIAYZLiAYYskuhCGAAO5It6orSIRymQ4AgwSBrGEIdQYkv7k+ogsF1WyQ8aRIA */
   createMachine(
     {
+      ...initMachine(),
       predictableActionArguments: true,
       id: "luvMachine",
       initial: "greeting",
