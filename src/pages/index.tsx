@@ -82,7 +82,6 @@ const luvMachine =
       ...initMachine(),
       predictableActionArguments: true,
       id: "luvMachine",
-      initial: "greeting",
       states: {
         greeting: {
           on: {
@@ -108,6 +107,28 @@ const luvMachine =
   );
 
 /* COMPONENTS */
+
+function CardForm() {
+  return (
+    <div>
+      <label className="block mb-4">
+        <span className="block">To:</span>
+        <input className="block border border-black w-full" type="text" />
+      </label>
+      <label className="block mb-4">
+        <span className="block">From:</span>
+        <input className="block border border-black w-full" type="text" />
+      </label>
+      <label className="block mb-4">
+        <span className="block">Message:</span>
+        <input
+          className="block border border-black h-[150px] w-full"
+          type="text"
+        />
+      </label>
+    </div>
+  );
+}
 
 export default function Home() {
   const [current, send] = useMachine(luvMachine);
@@ -168,27 +189,7 @@ export default function Home() {
           )}
           {current.matches("edit") && (
             <div className="p-4">
-              <label className="block mb-4">
-                <span className="block">To:</span>
-                <input
-                  className="block border border-black w-full"
-                  type="text"
-                />
-              </label>
-              <label className="block mb-4">
-                <span className="block">From:</span>
-                <input
-                  className="block border border-black w-full"
-                  type="text"
-                />
-              </label>
-              <label className="block mb-4">
-                <span className="block">Message:</span>
-                <input
-                  className="block border border-black h-[150px] w-full"
-                  type="text"
-                />
-              </label>
+              <CardForm />
               <div>
                 <button
                   className="text-white bg-primary p-4 rounded-full text-lg w-[200px]"
@@ -199,7 +200,11 @@ export default function Home() {
               </div>
             </div>
           )}
-          {current.matches("view") && <div>Final card state</div>}
+          {current.matches("view") && (
+            <div>
+              <div>Card preview component</div>
+            </div>
+          )}
         </div>
       </main>
     </>
