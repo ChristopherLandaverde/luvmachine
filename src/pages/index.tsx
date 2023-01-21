@@ -2,9 +2,10 @@ import Head from "next/head";
 import Image from "next/image";
 import { Inter, Dancing_Script } from "@next/font/google";
 import styles from "@/styles/Home.module.css";
-import { createMachine } from "xstate";
+import { assign, createMachine } from "xstate";
 import { useMachine } from "@xstate/react";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import queryString from "query-string";
 
 /* FONTS */
 
@@ -13,42 +14,120 @@ const dancingScript = Dancing_Script({
   subsets: ["latin"],
 });
 
+/* TYPES */
+
+interface CardFormState {
+  to: string;
+  from: string;
+  message: string;
+}
+
+/* CONSTS */
+
+const emptyFormState: CardFormState = {
+  to: "",
+  from: "",
+  message: "",
+};
+
+/* HISTORY PUSHSTATE */
+
+// Ugh cause SSR
+function getPage() {
+  if (typeof window === "undefined") {
+    return "greeting";
+  }
+  if (!window.location.hash || window.location.hash === "#") {
+    return "greeting";
+  }
+  if (window.location.hash === "#edit") {
+    return "edit";
+  }
+  return "view";
+}
+
+function saveFormState(formState: CardFormState) {
+  const serializedState = queryString.stringify(formState);
+  window.history.pushState(null, "", `#${window.btoa(serializedState)}`);
+}
+
+function parseFormClientState(): CardFormState {
+  // Remove the #
+  const parsedState = queryString.parse(
+    window.atob(window.location.hash.substring(1)),
+  );
+  return parsedState as unknown as CardFormState;
+}
+
+function initMachine(): { initial: string; context: CardFormState } {
+  // Ugh cause SSR
+  if (typeof window === "undefined") {
+    return { initial: "greeting", context: { ...emptyFormState } };
+  }
+  if (!window.location.hash || window.location.hash === "#") {
+    return { initial: "greeting", context: { ...emptyFormState } };
+  }
+  if (window.location.hash === "#edit") {
+    return { initial: "edit", context: { ...emptyFormState } };
+  }
+  return { initial: "view", context: { ...parseFormClientState() } };
+}
+
 /* XSTATE */
 
 const luvMachine =
   /** @xstate-layout N4IgpgJg5mDOIC5QBsCuA3AsgQwMYAsBLAOzADooAnMMAFxKgGIBxAUQBUB9AZXYEEASu1YARANoAGALqJQABwD2sQvQXFZIAB6IAjADYAzGQCcAdmP6ATGb0AWPcYCsADgA0IAJ6JnOsrfP6Ek4SzhISlnoAvpHuaFh4RKRkkCqMAMICrHzCkjJIIIrKqur52gi2jrZklhGOejoVDfU67l4IOhJVlqbOdpYGOjWmljo60TEgxAoQcBpxOAQkYBqFKoRqGmUAtHqtiFuOJsbHJ6cnBtGxGAuJ5FQ09MRQK0prG6WItpZ77Z1kpno6jpnJZHGC7AYLhN5gklskICoXkV1iVQGVIZZqv4DMZnP5bMcdJUfh0qgC6t1nAZLBIAYZLiAYYskuhCGAAO5It6orSIRymQ4AgwSBrGEIdQYkv7k+ogsF1WyQ8aRIA */
-  createMachine({
-    predictableActionArguments: true,
-    id: "luvMachine",
-    initial: "greeting",
-    states: {
-      greeting: {
-        on: {
-          GET_STARTED: {
-            target: "edit",
-            actions(context, event, meta) {
-              window.history.pushState(null, "", "#edit");
-            },
+  createMachine(
+    {
+      predictableActionArguments: true,
+      id: "luvMachine",
+      initial: "greeting",
+      states: {
+        greeting: {
+          on: {
+            GET_STARTED: "edit",
           },
         },
-      },
-      edit: {
-        on: {
-          CREATE: "view",
+        edit: {
+          on: {
+            CREATE: "view",
+          },
         },
+        view: {},
       },
-      view: {},
+      on: {
+        RESET: { target: "greeting", actions: "resetState" },
+      },
     },
-  });
+    {
+      actions: {
+        resetState: assign({ ...emptyFormState }),
+      },
+    },
+  );
 
 /* COMPONENTS */
 
 export default function Home() {
   const [current, send] = useMachine(luvMachine);
+  // Ugh, Next.js
+  const shouldNotRender = useDisableSSR();
 
-  console.log(current);
+  usePopState(() => {
+    const formState = getPage();
+    switch (formState) {
+      case "greeting":
+        send({ type: "RESET" });
+        break;
+      case "edit":
+        break;
+      case "view":
+        send({ type: "RESET" });
+        break;
+    }
+  });
 
-  return (
+  return shouldNotRender ? null : (
     <>
       <Head>
         <title>Luv Machine</title>
@@ -76,7 +155,10 @@ export default function Home() {
               <div className="text-center">
                 <button
                   className="text-white bg-primary p-4 rounded-full text-lg w-[200px]"
-                  onClick={() => send({ type: "GET_STARTED" })}
+                  onClick={() => {
+                    send({ type: "GET_STARTED" });
+                    window.history.pushState(null, "", "#edit");
+                  }}
                 >
                   Get started
                 </button>
@@ -106,6 +188,14 @@ export default function Home() {
                   type="text"
                 />
               </label>
+              <div>
+                <button
+                  className="text-white bg-primary p-4 rounded-full text-lg w-[200px]"
+                  onClick={() => send({ type: "CREATE" })}
+                >
+                  Create
+                </button>
+              </div>
             </div>
           )}
           {current.matches("view") && <div>Final card state</div>}
@@ -113,4 +203,23 @@ export default function Home() {
       </main>
     </>
   );
+}
+
+function useDisableSSR(): boolean {
+  const [disableSSR, setDisableSSR] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setDisableSSR(false);
+    }
+  }, []);
+
+  return disableSSR;
+}
+
+function usePopState(callback: () => void) {
+  useEffect(() => {
+    window.addEventListener("popstate", callback);
+    return () => window.removeEventListener("popstate", callback);
+  }, []);
 }
