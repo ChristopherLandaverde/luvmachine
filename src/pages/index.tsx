@@ -11,7 +11,7 @@ import queryString from "query-string";
 
 const rubik = Rubik({ subsets: ["latin"] });
 const roboto = Roboto({ subsets: ["latin"], weight: ["400", "500"] });
-const reenie = Reenie_Beanie({ subsets: ["latin"], weight: "400" });
+const reenie = Reenie_Beanie({ subsets: ["latin"], weight: "400", adjustFontFallback: false });
 
 /* TYPES */
 
