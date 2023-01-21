@@ -1,5 +1,6 @@
-# Luv Machine
+# Luv Machine for Valentine's Day <3
 
-## Let us "State" your message!
+### Let us "State" your message!
 
-Built with XState!
+Built with XState & Next.js. 
+
