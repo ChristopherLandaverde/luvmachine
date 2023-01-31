@@ -5,7 +5,7 @@ app.use(express.json())
 
 app.get('/', (req, res) => {
     console.log("Welcome to Certified State Lover.")
-    res.status(500).send("Hey Bitch")
+    res.status(500).send("Success")
 })
 
 
